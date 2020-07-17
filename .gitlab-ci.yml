@@ -1,0 +1,10 @@
+image: "debian:sid-slim"
+
+before_script:
+  - apt-get update -qq && apt-get install -y --no-install-recommends debootstrap
+
+generate_image:
+  script:
+    - |
+      debootstrap --components=main --variant=minbase --no-check-gpg --verbose testing ./rootfs http://deb.debian.org/debian
+
