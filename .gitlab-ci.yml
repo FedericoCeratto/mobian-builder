@@ -1,10 +1,19 @@
 image: "debian:sid-slim"
 
 before_script:
-  - apt-get update -qq && apt-get install -y --no-install-recommends debootstrap
+  - apt-get update
+  - apt-get install -y --no-install-recommends debootstrap squashfs-tools-ng
+  - debootstrap testing ./rootfs http://deb.debian.org/debian
+  - rm -rf ./rootfs/etc/machine-id \
+    ./rootfs/usr/lib/systemd/system/system-systemd\\x2dcryptsetup.slice \
+    ./rootfs/var/cache/ldconfig/aux-cache \
+    ./rootfs/var/log/alternatives.log \
+    ./rootfs/var/log/bootstrap.log \
+    ./rootfs/var/log/dpkg.log
+  - gensquashfs -D rootfs -f gh_unstable_squashfs.img
+  - md5sum gh_unstable_squashfs.img
+  - fallocate -l 500M gh_unstable_f2fs.img
 
 generate_image:
   script:
-    - |
-      debootstrap --components=main --variant=minbase --no-check-gpg --verbose testing ./rootfs http://deb.debian.org/debian
-
+    - true
