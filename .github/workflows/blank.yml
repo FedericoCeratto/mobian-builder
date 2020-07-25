@@ -8,11 +8,33 @@ on:
 
 jobs:
   build:
-    name: Greeting
-    runs-on: debian-buster
+    name: Build images
+    runs-on: ubuntu-latest
+    container: debian:sid
     steps:
     - uses: actions/checkout@v2
-    - name: Run a multi-line script
+    - name: Install pkgs
       run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+        apt-get update
+        apt-get install -y --no-install-recommends debootstrap squashfs-tools-ng
+
+    - name: debootstrap
+      run: debootstrap testing ./rootfs http://deb.debian.org/debian
+
+    - name: rm files
+      run: |
+        rm -rf ./rootfs/etc/machine-id \
+        ./rootfs/usr/lib/systemd/system/system-systemd\\x2dcryptsetup.slice \
+        ./rootfs/var/cache/ldconfig/aux-cache \
+        ./rootfs/var/log/alternatives.log \
+        ./rootfs/var/log/bootstrap.log \
+        ./rootfs/var/log/dpkg.log
+
+    - name: gensquashfs
+      run: gensquashfs -D rootfs -f gh_unstable_squashfs.img
+
+    - name: md5sum
+      run: md5sum gh_unstable_squashfs.img
+
+    - name: fallocate
+      run: fallocate -l 500M gh_unstable_f2fs.img
