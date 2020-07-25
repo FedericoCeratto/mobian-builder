@@ -17,3 +17,4 @@ before_script:
 generate_image:
   script:
     - true
+
