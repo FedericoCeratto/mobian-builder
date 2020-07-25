@@ -38,3 +38,9 @@ jobs:
 
     - name: fallocate
       run: fallocate -l 500M gh_unstable_f2fs.img
+
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: gh_unstable_squashfs.img
+        path: gh_unstable_squashfs.img
